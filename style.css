@@ -1,0 +1,82 @@
+ @font-face {
+    font-family: 'Sarabun';
+    src: url('fonts/Sarabun-Regular.ttf') format('truetype');
+}
+
+* {
+    font-family: 'Sarabun', sans-serif !important;
+}
+
+
+/*=========================================*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Tahoma', sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(135deg, #ffd194, #ffef8a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.login-card {
+    background: #fff8f0;
+    width: 420px;
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.title {
+    color: #d35400;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-staff {
+    background: #ff6f00;
+}
+
+.btn-staff:hover {
+    background: #e65100;
+}
+
+.btn-owner {
+    background: #00c853;
+}
+
+.btn-owner:hover {
+    background: #009624;
+}
+/*============================================*/
