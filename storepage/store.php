@@ -12,7 +12,51 @@ if ($_SESSION['role'] != 'store_owner') {
 
     <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="asset.css">
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+      <style>
+      .btn-logout {
+    background: linear-gradient(135deg, #d32f2f, #f5530eff);
+    padding: 10px 26px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-logout:hover {
+    background: linear-gradient(135deg, #b71c1c, #7f0000);
+    
+}
+.btn-logout,
+.btn-logout:hover,
+.btn-logout:focus {
+    color: #fff !important;
+}
+
+.menu-bar a {
+    display: inline-block;
+    padding: 10px 18px;
+    margin-right: 8px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/* เมนูที่ active */
+.menu-bar a.active {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    color: #fff;
+    font-weight: 600;
+}
+
+</style>
 </head>
+
+
 <body>
 
 <!-- ===== Navbar ===== -->
@@ -21,23 +65,46 @@ if ($_SESSION['role'] != 'store_owner') {
         <img src="../img/logo .png" height="50">
         <div>
             <h6 class="mb-0 text-orange fw-bold">ระบบจัดการจองโต๊ะ</h6>
-            <small class="text-muted">เจ้าของร้าน • สิทธิ์เต็ม</small>
+            <small class="text-muted me-2">เจ้าของร้าน <i class="bi bi-lock me-1"></i>สิทธิ์เต็ม</small>
         </div>
     </div>
 
-    <a href="../login/logout.php" class="btn btn-danger btn-sm">
-        ออกจากระบบ
-    </a>
+  <a href="../login/logout.php" class="btn btn-logout">
+    <i class="bi bi-box-arrow-right me-2"></i>
+    ออกจากระบบ
+</a>
+
+
 </nav>
 
 <!-- ===== Menu ===== -->
-<div class="menu-bar ps-5 ">
-    <a href="store.php?link=homes">หน้าหลัก</a>
-        <a href="store.php?link=table">แผนผังโต๊ะ</a>
-        <a href="store.php?link=list">รายการจอง</a>
-        <a href="store.php?link=reports">รายงาน</a>
-        <a href="store.php?link=add">เพิ่มพนักงาน</a>
+<?php $link = $_GET['link'] ?? 'homes'; ?>
 
+<div class="menu-bar ps-5">
+    <a href="store.php?link=homes"
+       class="<?= $link == 'homes' ? 'active' : '' ?>">
+        หน้าหลัก
+    </a>
+
+    <a href="store.php?link=table"
+       class="<?= $link == 'table' ? 'active' : '' ?>">
+        แผนผังโต๊ะ
+    </a>
+
+    <a href="store.php?link=list"
+       class="<?= $link == 'list' ? 'active' : '' ?>">
+        รายการจอง
+    </a>
+
+    <a href="store.php?link=reports"
+       class="<?= $link == 'reports' ? 'active' : '' ?>">
+        รายงาน
+    </a>
+
+    <a href="store.php?link=add"
+       class="<?= $link == 'add' ? 'active' : '' ?>">
+        เพิ่มพนักงาน
+    </a>
 </div>
 
 <div class="container my-4">

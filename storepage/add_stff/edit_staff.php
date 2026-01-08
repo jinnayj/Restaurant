@@ -31,7 +31,7 @@ $staff = $result->fetch_assoc();
 <body class="bg-light">
 <div class="container mt-4">
 
-<h4>✏️ แก้ไขพนักงาน</h4>
+<h4> <i class="bi bi-pencil-square me-2"></i>แก้ไขพนักงาน</h4>
 
 <form method="post" action="add_stff/update_staff.php">
     <input type="hidden" name="id" value="<?= $id ?>">
@@ -48,7 +48,7 @@ $staff = $result->fetch_assoc();
     </div>
 
     <button class="btn btn-success">บันทึก</button>
-    <a href="store.php?link=add" class="btn btn-secondary">กลับ</a>
+    <a href="store.php?link=add" class="btn btn-danger">กลับ</a>
 </form>
 
 </div>

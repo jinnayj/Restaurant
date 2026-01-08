@@ -31,7 +31,11 @@ $tables = $conn->query("SELECT * FROM tables");
 <body class="bg-light">
 <div class="container my-4">
 
-<h4 class="mb-3">✏️ แก้ไขการจอง</h4>
+<h4 class="mb-3">
+    <i class="bi bi-pencil-square me-2"></i>
+    แก้ไขการจอง
+</h4>
+
 
 <form method="post" action="update_reservation.php" class="card p-3 shadow-sm">
 <input type="hidden" name="id" value="<?= $data['id']; ?>">
@@ -57,13 +61,16 @@ $tables = $conn->query("SELECT * FROM tables");
 <?php while($t = $tables->fetch_assoc()): ?>
 <option value="<?= $t['id']; ?>"
 <?= $t['id']==$data['table_id']?'selected':''; ?>>
-โต๊ะ <?= $t['table_number']; ?> (<?= $t['seat']; ?> ที่)
+โต๊ะ <?= $t['table_number']; ?> (<?= $t['seat']; ?> ที่นั่ง)
 </option>
 <?php endwhile; ?>
 </select>
 
-<button class="btn btn-success">บันทึก</button>
-<a href="store.php?link=list" class="btn btn-secondary">ยกเลิก</a>
+<div class="d-flex gap-2">
+    <button class="btn btn-success px-5">บันทึก</button>
+    <a href="store.php?link=list" class="btn btn-danger px-5">ยกเลิก</a>
+</div>
+
 </form>
 
 </div>

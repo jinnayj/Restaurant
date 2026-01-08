@@ -7,6 +7,9 @@ require_once __DIR__ . "/../config/db.php";
 
 /* ===== วันที่ที่เลือก ===== */
 $selected_date = $_GET['date'] ?? date('Y-m-d');
+$today = date('Y-m-d');
+$isToday = ($selected_date === $today);
+
 
 /* ===== Summary ===== */
 $total = $conn->query("SELECT COUNT(*) c FROM tables")->fetch_assoc()['c'];
@@ -47,6 +50,8 @@ $tables = $stmt->get_result();
 <title>แผนผังโต๊ะ</title>
 
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 <style>
 .table-area{
@@ -73,35 +78,65 @@ $tables = $stmt->get_result();
     background:#dc3545;
     color:#fff;
 }
+/* ปุ่มเพิ่มการจอง */
+.btn-orange-gradient {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    padding: 10px 10px;
+    border-radius: 10px;
+    
+}
+
+.btn-orange-gradient:hover {
+    background: linear-gradient(135deg, #ff5722, #e65100);
+    color: #fff;
+    
+}
+
+.border-orange-right {
+    border-right: 4px solid #ff9800;
+    color: #e65100;
+}
+
+
 </style>
 </head>
 
-<body class="bg-light">
-
-<div class="container my-4">
-
-<!-- ===== เลือกวันที่ ===== -->
-<form method="get" class="mb-4">
-    <!-- สำคัญมาก ถ้าใช้ระบบ link -->
-    <input type="hidden" name="link" value="table">
-
-    <label class="fw-bold mb-1">📅 เลือกวันที่ดูการจอง</label>
-    <input type="date"
-           name="date"
-           value="<?= $selected_date ?>"
-           class="form-control w-25"
-           onchange="this.form.submit()">
-</form>
-<!-- ===== Add booking ===== -->
 <div class="card mb-4 shadow-sm">
-    <div class="card-body text-end">
-        <button class="btn btn-warning"
-                data-bs-toggle="modal"
-                data-bs-target="#bookingModal">
-            ➕ เพิ่มการจองใหม่
-        </button>
+    <div class="card-body">
+
+        <form method="get" class="d-flex justify-content-between align-items-end">
+            <input type="hidden" name="link" value="table">
+
+            <!-- เลือกวันที่ -->
+            <div>
+                <label class="fw-bold mb-1"><i class="bi bi-calendar2 me-2"></i> เลือกวันที่ดูการจอง</label>
+                <input type="date"
+                       name="date"
+                       value="<?= $selected_date ?>"
+                       class="form-control"
+                       style="width: 200px;"
+                       onchange="this.form.submit()">
+            </div>
+
+            <!-- ปุ่มเพิ่มการจอง -->
+            <button type="button"
+        class="btn btn-orange-gradient h-50"
+        data-bs-toggle="modal"
+        data-bs-target="#bookingModal">
+   <i class="bi bi-calendar2-plus me-2"></i>
+   เพิ่มการจองใหม่
+</button>
+
+
+        </form>
+
     </div>
 </div>
+
+
 <div class="modal fade" id="bookingModal">
 <div class="modal-dialog modal-lg">
 <div class="modal-content">
@@ -160,7 +195,7 @@ $tables = $stmt->get_result();
 
 <div class="modal-footer">
     <button class="btn btn-success">บันทึกการจอง</button>
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
         ยกเลิก
     </button>
 </div>
@@ -173,31 +208,31 @@ $tables = $stmt->get_result();
 
 <!-- ===== Summary ===== -->
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="p-3 bg-white rounded shadow-sm">
-            โต๊ะทั้งหมด<br>
-            <b><?= $total ?></b>
-        </div>
+
+   <div class="col-md-3">
+    <div class="p-3 bg-white rounded shadow-sm border-orange-right">
+        โต๊ะทั้งหมด<br>
+        <b><?= $total ?></b>
     </div>
+</div>
+
     <div class="col-md-3">
-        <div class="p-3 bg-white rounded shadow-sm text-success">
+        <div class="p-3 bg-white rounded shadow-sm text-success
+                    border-end border-4 border-success">
             ว่าง<br>
             <b><?= $available ?></b>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="p-3 bg-white rounded shadow-sm text-warning">
-            จองแล้ว<br>
-            <b><?= $reserved ?></b>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="p-3 bg-white rounded shadow-sm text-danger">
+        <div class="p-3 bg-white rounded shadow-sm text-danger
+                    border-end border-4 border-danger">
             กำลังใช้<br>
             <b><?= $using ?></b>
         </div>
     </div>
 </div>
+
 
 <!-- ===== แผนผังโต๊ะ ===== -->
  
@@ -225,7 +260,7 @@ $tables = $stmt->get_result();
          onclick="handleTableClick(this)">
          
         โต๊ะ <?= $t['table_number']; ?><br>
-        👥 <?= $t['seat']; ?> ที่
+        <i class="bi bi-people"></i> <?= $t['seat']; ?> ที่นั่ง
     </div>
 <?php endwhile; ?>
 </div>
@@ -286,37 +321,56 @@ function openStatusModal(el){
       <div class="modal-body" id="detailBody"></div>
 
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-      </div>
+    <button class="btn btn-danger px-5" data-bs-dismiss="modal">ปิด</button>
+</div>
+
 
     </div>
   </div>
 </div>
 
 <script>
+const isToday = <?= $isToday ? 'true' : 'false' ?>;
+</script>
+<script>
 function handleTableClick(el) {
     const customer = el.dataset.customer;
 
-    // 🟢 โต๊ะว่าง → เปลี่ยนสถานะ
+    // ❌ ถ้าไม่ใช่ "วันนี้"
+    if (!isToday) {
+        // ดูรายละเอียดได้เฉพาะโต๊ะที่จองแล้ว
+        if (customer) {
+            showDetail(el);
+        }
+        return;
+    }
+
+    // 🟢 วันนี้ + โต๊ะว่าง → เปลี่ยนสถานะ
     if (!customer) {
         document.getElementById("modal_table_id").value = el.dataset.id;
         new bootstrap.Modal(document.getElementById('statusModal')).show();
         return;
     }
 
-    // 🟡 โต๊ะที่มีการจอง → แสดงรายละเอียด
+    // 🟡 วันนี้ + โต๊ะที่จอง → ดูรายละเอียด
+    showDetail(el);
+}
+
+// แยกฟังก์ชันแสดงรายละเอียด
+function showDetail(el) {
     let html = `
-        <p><strong>🍽 โต๊ะ:</strong> ${el.dataset.table}</p>
-        <p><strong>⏰ เวลา:</strong> ${el.dataset.time}</p>
-        <p><strong>👤 ลูกค้า:</strong> ${el.dataset.customer}</p>
-        <p><strong>📞 เบอร์โทร:</strong> ${el.dataset.phone}</p>
-        <p><strong>👥 ที่นั่ง:</strong> ${el.dataset.seat} ที่</p>
+        <p><strong><i class="bi bi-person-fill"></i> ลูกค้า:</strong> ${el.dataset.customer}</p>
+        <p><strong><i class="bi bi-telephone-fill"></i> เบอร์โทร:</strong> ${el.dataset.phone}</p>
+        <p><strong><i class="bi bi-clock-fill"></i> เวลา:</strong> ${el.dataset.time}</p>
+        <p><strong><i class="bi bi-table"></i> โต๊ะ:</strong> ${el.dataset.table}</p>
+        <p><strong><i class="bi bi-people-fill"></i> ที่นั่ง:</strong> ${el.dataset.seat} ที่</p>
     `;
 
     document.getElementById('detailBody').innerHTML = html;
     new bootstrap.Modal(document.getElementById('detailModal')).show();
 }
 </script>
+
 
 
 </body>

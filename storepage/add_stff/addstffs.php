@@ -21,12 +21,16 @@ $users = $conn->query("SELECT id, username, role FROM users ORDER BY role, usern
 <meta charset="UTF-8">
 <title>จัดการพนักงาน</title>
 <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 <body class="bg-light">
 
 <div class="container my-4">
 
-    <h3 class="mb-3">👥 จัดการพนักงาน</h3>
+    <h4 class="mb-3">
+    <i class="bi bi-person-gear me-2 fs-2"></i>จัดการพนักงาน
+</h4>
 
     <!-- ===== เพิ่มพนักงาน ===== -->
     <div class="card mb-4">
@@ -47,7 +51,7 @@ $users = $conn->query("SELECT id, username, role FROM users ORDER BY role, usern
 
                 <div class="col-md-4">
                     <button type="submit" class="btn btn-success w-100">
-                        ➕ เพิ่มพนักงาน
+                       <i class="bi bi-plus-square me-2"></i>เพิ่มพนักงาน
                     </button>
                 </div>
 
@@ -75,12 +79,12 @@ $users = $conn->query("SELECT id, username, role FROM users ORDER BY role, usern
                         <td>
                             <?php if($u['role'] !== 'store_owner'): ?>
                                 <a href="store.php?link=edit&id=<?= $u['id'] ?>" class="btn btn-sm btn-warning">
-                                    ✏️ แก้ไข
+                                  <i class="bi bi-pencil-square me-2"></i>แก้ไข
                                 </a>
                                 <a href="add_stff/delete_staff.php?id=<?= $u['id'] ?>"
                                    class="btn btn-sm btn-danger"
                                    onclick="return confirm('ยืนยันลบพนักงาน?')">
-                                    🗑️ ลบ
+                                   <i class="bi bi-trash3 me-2"></i>ลบ
                                 </a>
                             <?php else: ?>
                                 <span class="text-muted">เจ้าของร้าน</span>

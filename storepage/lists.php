@@ -29,13 +29,16 @@ $result = $stmt->get_result();
 <meta charset="UTF-8">
 <title>รายการจอง</title>
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
 </head>
 
 <body class="bg-light">
 <div class="container my-4">
 
-<h4 class="mb-3 text-warning">
-📅 รายการจองวันที่ <?= date('d/m/Y', strtotime($selected_date)); ?>
+<h4 class="mb-3 text-dark">
+<i class="bi bi-calendar2-check-fill me-2 "></i></i></i>รายการจองวันที่ <?= date('d/m/Y', strtotime($selected_date)); ?>
 </h4>
 
 <form method="get" class="row g-2 mb-3">
@@ -68,32 +71,44 @@ $result = $stmt->get_result();
 <table class="table table-bordered table-hover align-middle">
 <thead class="table-warning text-center">
 <tr>
+    <th>ชื่อลูกค้า</th>
+    <th>เบอร์โทร</th>
     <th>เวลา</th>
     <th>โต๊ะ</th>
     <th>ที่นั่ง</th>
-    <th>ชื่อลูกค้า</th>
-    <th>เบอร์โทร</th>
     <th>จัดการ</th>
 </tr>
+
 </thead>
 
 <tbody>
 <?php while($row = $result->fetch_assoc()): ?>
 <tr>
-    <td><?= substr($row['reservation_time'], 0, 5); ?></td>
-    <td>โต๊ะ <?= $row['table_number']; ?></td>
-    <td><?= $row['seat']; ?> ที่</td>
+   <thead class="text-center">
     <td><?= htmlspecialchars($row['customer_name']); ?></td>
     <td><?= htmlspecialchars($row['phone']); ?></td>
-    <td class="text-center">
-        <a href="edit_reservation.php?id=<?= $row['id']; ?>"
-           class="btn btn-sm btn-warning">✏️ แก้ไข</a>
+    <td><?= substr($row['reservation_time'], 0, 5); ?></td>
+     <td>โต๊ะ <?= $row['table_number']; ?></td>
+     <td><?= $row['seat']; ?> ที่นั่ง</td>
 
-        <a href="cancel_reservation.php?id=<?= $row['id']; ?>"
-           class="btn btn-sm btn-danger"
-           onclick="return confirm('ยืนยันยกเลิกการจองนี้?');">
-           🗑️ ยกเลิก
-        </a>
+    <td class="text-center">
+<a href="store.php?link=edit_lists&id=<?= $row['id']; ?>"
+   class="btn btn-sm btn-warning"><i class="bi bi-pencil-square me-2"></i>แก้ไข</a>
+
+<a href="cancel_reservation.php?id=<?= $row['id']; ?>"
+   class="btn btn-sm btn-danger"
+   onclick="return confirm('ยืนยันยกเลิกการจองนี้?');">
+   <i class="bi bi-trash3 me-2"></i> ยกเลิก
+</a>
+<?php if ($row['status'] == 'confirmed'): ?>
+    <a href="complete_reservation.php?id=<?= $row['id']; ?>"
+       class="btn btn-sm btn-success"
+       onclick="return confirm('ยืนยันว่าใช้งานเสร็จแล้ว?');">
+       <i class="bi bi-check2-circle me-2"></i>เสร็จสิ้น
+    </a>
+<?php endif; ?>
+</td>
+       
     </td>
 </tr>
 <?php endwhile; ?>
