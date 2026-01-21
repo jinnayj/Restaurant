@@ -10,7 +10,7 @@ $customer_name    = trim($_POST['customer_name'] ?? '');
 $phone            = trim($_POST['phone'] ?? '');
 $reservation_date = $_POST['reservation_date'] ?? '';
 $reservation_time = $_POST['reservation_time'] ?? '';
-$table_id         = $_POST['table_id'] ?? '';
+$table_id         = (int)($_POST['table_id'] ?? 0);
 $created_by       = $_SESSION['user_id'] ?? null;
 
 /* ===== ตรวจค่าว่าง ===== */
@@ -19,21 +19,21 @@ if (
     $phone === '' ||
     $reservation_date === '' ||
     $reservation_time === '' ||
-    $table_id === ''
+    $table_id === 0
 ) {
     echo "<script>alert('กรุณากรอกข้อมูลให้ครบ');history.back();</script>";
     exit;
 }
 
-/* ===== เตรียมคำสั่ง SQL ===== */
+/* ===== บันทึกการจอง ===== */
 $stmt = $conn->prepare("
     INSERT INTO reservations
-    (customer_name, phone, table_id, reservation_date, reservation_time, created_by)
-    VALUES (?, ?, ?, ?, ?, ?)
+    (customer_name, phone, table_id, reservation_date, reservation_time, status, created_by)
+    VALUES (?, ?, ?, ?, ?, 'confirmed', ?)
 ");
 
 $stmt->bind_param(
-    "ssisss",
+    "ssissi",
     $customer_name,
     $phone,
     $table_id,
@@ -42,15 +42,9 @@ $stmt->bind_param(
     $created_by
 );
 
-/* ===== บันทึก ===== */
 if ($stmt->execute()) {
-
-    // อัปเดตสถานะโต๊ะ
-    $conn->query("UPDATE tables SET status='reserved' WHERE id='$table_id'");
-
-    header("Location:staff.php?link=table");
+    header("Location: staff.php?link=table");
     exit;
-
 } else {
     echo "เกิดข้อผิดพลาด: " . $stmt->error;
 }

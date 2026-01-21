@@ -9,13 +9,13 @@ $reservation_date = $_POST['reservation_date'] ?? null;
 $today = date('Y-m-d');
 
 if (!$table_id || !$status || !$reservation_date) {
-    header("Location: store.php");
+    header("Location: staff.php");
     exit;
 }
 
 /* ❌ ไม่ใช่วันนี้ ห้ามแก้ */
 if ($reservation_date !== $today) {
-    header("Location: store.php?link=table");
+    header("Location: staff.php?link=table");
     exit;
 }
 
@@ -31,7 +31,7 @@ if ($status === 'available') {
     $del->bind_param("is", $table_id, $reservation_date);
     $del->execute();
 
-    header("Location: store.php?link=table");
+    header("Location: staff.php?link=table");
     exit;
 }
 
@@ -71,5 +71,5 @@ if ($res->num_rows > 0) {
     $ins->execute();
 }
 
-header("Location: store.php?link=table");
+header("Location: staff.php?link=table");
 exit;

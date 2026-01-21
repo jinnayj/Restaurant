@@ -10,13 +10,21 @@ $selected_date = $_GET['date'] ?? date('Y-m-d');
 
 /* ดึงรายการจองที่ยังยืนยัน */
 $sql = "
-SELECT r.*, t.table_number, t.seat
+SELECT 
+    r.id_booking,
+    r.customer_name,
+    r.phone,
+    r.reservation_time,
+    r.status,
+    t.table_number,
+    t.seat
 FROM reservations r
-JOIN tables t ON r.table_id = t.id
+JOIN tables t ON r.table_id = t.id_show
 WHERE r.reservation_date = ?
 AND r.status = 'confirmed'
 ORDER BY r.reservation_time ASC
 ";
+
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $selected_date);
@@ -29,13 +37,19 @@ $result = $stmt->get_result();
 <meta charset="UTF-8">
 <title>รายการจอง</title>
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body class="bg-light">
 <div class="container my-4">
 
-<h4 class="mb-3 text-warning">
-📅 รายการจองวันที่ <?= date('d/m/Y', strtotime($selected_date)); ?>
+<h4 class="mb-3 text-dark">
+<i class="bi bi-calendar2-check-fill me-2 "></i></i></i>รายการจองวันที่ <?= date('d/m/Y', strtotime($selected_date)); ?>
 </h4>
 
 <form method="get" class="row g-2 mb-3">
@@ -68,25 +82,27 @@ $result = $stmt->get_result();
 <table class="table table-bordered table-hover align-middle">
 <thead class="table-warning text-center">
 <tr>
+    <th>ชื่อลูกค้า</th>
+    <th>เบอร์โทร</th>
     <th>เวลา</th>
     <th>โต๊ะ</th>
     <th>ที่นั่ง</th>
-    <th>ชื่อลูกค้า</th>
-    <th>เบอร์โทร</th>
+    
 </tr>
+
 </thead>
 
 <tbody>
 <?php while($row = $result->fetch_assoc()): ?>
-<tr>
-    <td><?= substr($row['reservation_time'], 0, 5); ?></td>
-    <td>โต๊ะ <?= $row['table_number']; ?></td>
-    <td><?= $row['seat']; ?> ที่</td>
+<tr class="text-center">
     <td><?= htmlspecialchars($row['customer_name']); ?></td>
     <td><?= htmlspecialchars($row['phone']); ?></td>
-    
+    <td><?= substr($row['reservation_time'], 0, 5); ?></td>
+    <td>โต๊ะ <?= $row['table_number']; ?></td>
+    <td><?= $row['seat']; ?> ที่นั่ง</td>
 </tr>
 <?php endwhile; ?>
+
 </tbody>
 </table>
 

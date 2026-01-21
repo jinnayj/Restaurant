@@ -7,7 +7,7 @@ if ($_SESSION['role'] !== 'store_owner') {
     die("ไม่มีสิทธิ์เข้าถึง");
 }
 
-$staff = $conn->query("SELECT id, username FROM users WHERE role='staff'");
+$staff = $conn->query("SELECT id_ser, username FROM users WHERE role='staff'");
 ?>
 
 <!DOCTYPE html>
@@ -16,6 +16,10 @@ $staff = $conn->query("SELECT id, username FROM users WHERE role='staff'");
 <meta charset="UTF-8">
 <title>รายชื่อพนักงาน</title>
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body class="bg-light">
@@ -37,11 +41,11 @@ $staff = $conn->query("SELECT id, username FROM users WHERE role='staff'");
     <td><?= $i++ ?></td>
     <td><?= htmlspecialchars($row['username']) ?></td>
     <td>
-        <a href="edit_staff.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">
+        <a href="edit_staff.php?id=<?= $row['id_ser'] ?>" class="btn btn-warning btn-sm">
             ✏️ แก้ไข
         </a>
 
-        <a href="delete_staff.php?id=<?= $row['id'] ?>"
+        <a href="delete_staff.php?id=<?= $row['id_ser'] ?>"
            class="btn btn-danger btn-sm"
            onclick="return confirm('ยืนยันลบพนักงานคนนี้?')">
            🗑️ ลบ

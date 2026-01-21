@@ -8,11 +8,14 @@
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="../style.css">
      <link rel="icon" href="../img/logo .png">
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../img/logo .png .png">
 </head>
 <body>
 
 <div class="container-fluid bg-gradient-custom min-vh-100 d-flex justify-content-center align-items-center">
-
     <div class="card login-card shadow border-0">
         <div class="card-body px-4 py-5">
 

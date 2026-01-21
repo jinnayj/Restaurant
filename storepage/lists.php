@@ -10,13 +10,23 @@ $selected_date = $_GET['date'] ?? date('Y-m-d');
 
 /* ดึงรายการจองที่ยังยืนยัน */
 $sql = "
-SELECT r.*, t.table_number, t.seat
+SELECT 
+    r.id_booking,
+    r.customer_name,
+    r.phone,
+    r.reservation_time,
+    r.status,
+    t.table_number,
+    t.seat
 FROM reservations r
-JOIN tables t ON r.table_id = t.id
+JOIN tables t ON r.table_id = t.id_show
 WHERE r.reservation_date = ?
 AND r.status = 'confirmed'
 ORDER BY r.reservation_time ASC
 ";
+
+
+
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $selected_date);
@@ -31,7 +41,10 @@ $result = $stmt->get_result();
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../img/logo .png .png">
 </head>
 
 <body class="bg-light">
@@ -83,25 +96,25 @@ $result = $stmt->get_result();
 
 <tbody>
 <?php while($row = $result->fetch_assoc()): ?>
-<tr>
-   <thead class="text-center">
+<tr class="text-center">
     <td><?= htmlspecialchars($row['customer_name']); ?></td>
     <td><?= htmlspecialchars($row['phone']); ?></td>
     <td><?= substr($row['reservation_time'], 0, 5); ?></td>
-     <td>โต๊ะ <?= $row['table_number']; ?></td>
-     <td><?= $row['seat']; ?> ที่นั่ง</td>
+    <td>โต๊ะ <?= $row['table_number']; ?></td>
+    <td><?= $row['seat']; ?> ที่นั่ง</td>
+    <td>
 
     <td class="text-center">
-<a href="store.php?link=edit_lists&id=<?= $row['id']; ?>"
+<a href="store.php?link=edit_lists&id=<?= $row['id_booking']; ?>"
    class="btn btn-sm btn-warning"><i class="bi bi-pencil-square me-2"></i>แก้ไข</a>
 
-<a href="cancel_reservation.php?id=<?= $row['id']; ?>"
+<a href="cancel_reservation.php?id=<?= $row['id_booking']; ?>"
    class="btn btn-sm btn-danger"
    onclick="return confirm('ยืนยันยกเลิกการจองนี้?');">
    <i class="bi bi-trash3 me-2"></i> ยกเลิก
 </a>
 <?php if ($row['status'] == 'confirmed'): ?>
-    <a href="complete_reservation.php?id=<?= $row['id']; ?>"
+    <a href="complete_reservation.php?id=<?= $row['id_booking']; ?>"
        class="btn btn-sm btn-success"
        onclick="return confirm('ยืนยันว่าใช้งานเสร็จแล้ว?');">
        <i class="bi bi-check2-circle me-2"></i>เสร็จสิ้น

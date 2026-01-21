@@ -41,17 +41,20 @@ $percent = ($totalBooking > 0)
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../img/logo .png .png">
     
 
 <div class="row g-4 mb-4">
 
-<!-- 🟧 การจองทั้งหมด -->
+<!-- 🟧 การจองและการใช้งานทั้งหมด -->
 <div class="col-md-6">
     <div class="summary-card orange">
         <div class="d-flex justify-content-between align-items-start">
             <div>
-                <div class="title">การจองทั้งหมด</div>
+                <div class="title">การจองและการใช้งานทั้งหมด</div>
                 <div class="value"><?= $totalBooking ?></div>
                 <div class="sub">วันนี้</div>
             </div>
@@ -77,6 +80,10 @@ $percent = ($totalBooking > 0)
 </div>
 
 <style>
+    * {
+    font-family: 'Sarabun', sans-serif !important;
+}
+
 .summary-card {
     border-radius: 16px;
     padding: 24px;

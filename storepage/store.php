@@ -14,8 +14,15 @@ if ($_SESSION['role'] != 'store_owner') {
     <link rel="stylesheet" href="asset.css">
     <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../img/logo .png">
       <style>
+        * {
+    font-family: 'Sarabun', sans-serif !important;
+}
+
       .btn-logout {
     background: linear-gradient(135deg, #d32f2f, #f5530eff);
     padding: 10px 26px;
@@ -52,6 +59,7 @@ if ($_SESSION['role'] != 'store_owner') {
     color: #fff;
     font-weight: 600;
 }
+
 
 </style>
 </head>

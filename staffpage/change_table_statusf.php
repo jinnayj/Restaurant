@@ -9,13 +9,13 @@ $reservation_date = $_POST['reservation_date'] ?? null;
 $today = date('Y-m-d');
 
 if (!$table_id || !$status || !$reservation_date) {
-    header("Location: store.php");
+    header("Location: staff.php");
     exit;
 }
 
 /* ❌ ไม่ใช่วันนี้ ห้ามแก้ */
 if ($reservation_date !== $today) {
-    header("Location: store.php?link=table");
+    header("Location:staff.php?link=table");
     exit;
 }
 
@@ -31,13 +31,13 @@ if ($status === 'available') {
     $del->bind_param("is", $table_id, $reservation_date);
     $del->execute();
 
-    header("Location: store.php?link=table");
+    header("Location:staff.php?link=table");
     exit;
 }
 
 /* ===== ตรวจว่ามี reservation อยู่ไหม ===== */
 $check = $conn->prepare("
-    SELECT id_booking FROM reservations
+    SELECT id FROM reservations
     WHERE table_id = ?
     AND reservation_date = ?
     AND status IN ('confirmed','using')
@@ -50,12 +50,12 @@ $res = $check->get_result();
 if ($res->num_rows > 0) {
 
     $row = $res->fetch_assoc();
-    $rid = $row['id_booking'];
+    $rid = $row['id'];
 
     $upd = $conn->prepare("
         UPDATE reservations
         SET status = ?
-        WHERE id_booking = ?
+        WHERE id = ?
     ");
     $upd->bind_param("si", $status, $rid);
     $upd->execute();
@@ -71,5 +71,5 @@ if ($res->num_rows > 0) {
     $ins->execute();
 }
 
-header("Location: store.php?link=table");
+header("Location:staff.php?link=table");
 exit;

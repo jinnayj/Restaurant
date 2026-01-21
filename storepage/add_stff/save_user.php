@@ -3,18 +3,27 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if ($_SESSION['role'] !== 'store_owner') {
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'store_owner') {
     die("ไม่อนุญาต");
 }
 
 require_once __DIR__ . '/../../connect.php';
 
-$username = trim($_POST['username']);
-$password = trim($_POST['password']);
+$username = trim($_POST['username'] ?? '');
+$password = trim($_POST['password'] ?? '');
 $role = 'staff';
 
-/* เช็กซ้ำ */
-$check = $conn->prepare("SELECT id FROM users WHERE username=?");
+/* ตรวจค่าว่าง */
+if ($username === '' || $password === '') {
+    echo "<script>alert('กรุณากรอก Username และ Password');history.back();</script>";
+    exit;
+}
+
+/* เช็ก username ซ้ำ */
+$check = $conn->prepare("SELECT id_ser FROM users WHERE username = ?");
+if (!$check) {
+    die("Prepare failed (check): " . $conn->error);
+}
 $check->bind_param("s", $username);
 $check->execute();
 $check->store_result();
@@ -24,15 +33,17 @@ if ($check->num_rows > 0) {
     exit;
 }
 
-/* hash รหัสผ่าน */
-$hash = password_hash($password, PASSWORD_DEFAULT);
-
-/* insert */
+/* insert staff */
 $stmt = $conn->prepare(
-    "INSERT INTO users (username,password,role) VALUES (?,?,?)"
+    "INSERT INTO users (username, password, role)
+     VALUES (?, ?, ?)"
 );
-$stmt->bind_param("sss", $username, $hash, $role);
+if (!$stmt) {
+    die("Prepare failed (insert): " . $conn->error);
+}
+
+$stmt->bind_param("sss", $username, $password, $role);
 $stmt->execute();
 
-header("Location:../store.php?link=add");
+header("Location: ../store.php?link=add");
 exit;

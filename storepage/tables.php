@@ -45,11 +45,12 @@ SELECT
     END AS booking_status
 FROM tables t
 LEFT JOIN reservations r 
-    ON r.table_id = t.id
+    ON r.table_id = t.id_show
     AND r.reservation_date = ?
     AND r.status IN ('confirmed','using')
-ORDER BY t.id ASC
+ORDER BY t.id_show ASC
 ";
+
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $selected_date);
@@ -64,8 +65,16 @@ $tables = $stmt->get_result();
 
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../img/logo .png .png">
 
 <style>
+    * {
+    font-family: 'Sarabun', sans-serif !important;
+}
+
 .table-area{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
 .table-box{padding:15px;border-radius:12px;text-align:center;font-weight:bold;cursor:pointer}
 .available{background:#00c853;color:#fff}
@@ -109,24 +118,28 @@ $tables = $stmt->get_result();
 
 <div class="mb-3">
 <span class="badge bg-success">ว่าง</span>
-<span class="badge bg-warning text-dark ms-2">จองแล้ว</span>
 <span class="badge bg-danger ms-2">กำลังใช้</span>
 </div>
 
 <div class="table-area">
 <?php while($t = $tables->fetch_assoc()): ?>
 <div class="table-box <?= $t['booking_status'] ?> <?= !$isToday ? 'opacity-50' : '' ?>"
-     data-id="<?= $t['id'] ?>"
+     data-id="<?= $t['id_show'] ?>"
      data-table="<?= $t['table_number'] ?>"
      data-seat="<?= $t['seat'] ?>"
      data-customer="<?= $t['customer_name'] ?? '' ?>"
      data-phone="<?= $t['phone'] ?? '' ?>"
      data-time="<?= isset($t['reservation_time']) ? substr($t['reservation_time'],0,5) : '' ?>"
      onclick="handleTableClick(this)">
+
     โต๊ะ <?= $t['table_number'] ?><br>
+
     <small>
+        👥 <?= $t['seat'] ?> ที่นั่ง
+         <br>
         <?= $t['booking_status']=='using'?'กำลังใช้':($t['booking_status']=='reserved'?'จองแล้ว':'ว่าง') ?>
     </small>
+
 </div>
 <?php endwhile; ?>
 </div>
@@ -144,7 +157,6 @@ $tables = $stmt->get_result();
 <div class="modal-body">
 <select name="status" class="form-select" required>
     <option value="available">ว่าง</option>
-    <option value="confirmed">จองแล้ว</option>
     <option value="using">กำลังใช้</option>
 </select>
 
@@ -166,6 +178,94 @@ $tables = $stmt->get_result();
 </div>
 
 <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
+<div class="modal fade" id="bookingModal">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<form action="save_reservation.php" method="post">
+
+<div class="modal-header bg-warning">
+    <h5 class="modal-title">
+        <i class="bi bi-calendar2-plus me-2"></i> เพิ่มการจองใหม่
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+<div class="row g-3">
+
+<div class="col-md-6">
+    <label class="fw-bold">ชื่อลูกค้า</label>
+    <input type="text" name="customer_name" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+    <label class="fw-bold">เบอร์โทร</label>
+    <input type="text" name="phone" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+    <label class="fw-bold">วันที่</label>
+    <input type="date"
+           name="reservation_date"
+           class="form-control"
+           value="<?= $selected_date ?>"
+           readonly>
+</div>
+
+
+<div class="col-md-6">
+    <label class="fw-bold">เวลา</label>
+    <input type="time" name="reservation_time" class="form-control" required>
+</div>
+
+<div class="col-md-12">
+    <label class="fw-bold">เลือกโต๊ะ</label>
+    <select name="table_id" class="form-select" required>
+        <option value="">-- เลือกโต๊ะ --</option>
+        <?php
+$tb = $conn->prepare("
+    SELECT t.*
+    FROM tables t
+    WHERE t.id_show NOT IN (
+        SELECT table_id
+        FROM reservations
+        WHERE reservation_date = ?
+        AND status IN ('confirmed','using')
+    )
+    ORDER BY CAST(t.table_number AS UNSIGNED) ASC
+");
+$tb->bind_param("s", $selected_date);
+$tb->execute();
+$result = $tb->get_result();
+
+while($t = $result->fetch_assoc()):
+?>
+        <option value="<?= $t['id_show'] ?>">
+            โต๊ะ <?= $t['table_number'] ?> (<?= $t['seat'] ?> ที่)
+        </option>
+        <?php endwhile; ?>
+    </select>
+</div>
+
+
+</div>
+</div>
+
+<div class="modal-footer">
+    <button type="submit" class="btn btn-success px-4">
+        บันทึกการจอง
+    </button>
+    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+        ยกเลิก
+    </button>
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
 <script>
 const isToday = <?= $isToday ? 'true' : 'false' ?>;
 

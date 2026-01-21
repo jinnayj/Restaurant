@@ -12,7 +12,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'store_owner') {
 require_once __DIR__ . '/../../connect.php';
 
 /* ดึงรายชื่อผู้ใช้ */
-$users = $conn->query("SELECT id, username, role FROM users ORDER BY role, username");
+$users = $conn->query("SELECT id_ser , username, role FROM users ORDER BY role, username");
 ?>
 
 <!DOCTYPE html>
@@ -23,6 +23,10 @@ $users = $conn->query("SELECT id, username, role FROM users ORDER BY role, usern
 <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 <body class="bg-light">
 
@@ -78,14 +82,15 @@ $users = $conn->query("SELECT id, username, role FROM users ORDER BY role, usern
                         <td><?= $u['role'] ?></td>
                         <td>
                             <?php if($u['role'] !== 'store_owner'): ?>
-                                <a href="store.php?link=edit&id=<?= $u['id'] ?>" class="btn btn-sm btn-warning">
+                                <a href="store.php?link=edit&id=<?= $u['id_ser'] ?>" class="btn btn-sm btn-warning">
                                   <i class="bi bi-pencil-square me-2"></i>แก้ไข
                                 </a>
-                                <a href="add_stff/delete_staff.php?id=<?= $u['id'] ?>"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('ยืนยันลบพนักงาน?')">
-                                   <i class="bi bi-trash3 me-2"></i>ลบ
-                                </a>
+                                <a href="add_stff/delete_staff.php?id_ser=<?= $u['id_ser'] ?>"
+                                      class="btn btn-sm btn-danger"
+                                        onclick="return confirm('ยืนยันลบพนักงาน?')">
+                                         <i class="bi bi-trash3 me-2"></i>ลบ
+                                              </a>
+
                             <?php else: ?>
                                 <span class="text-muted">เจ้าของร้าน</span>
                             <?php endif; ?>

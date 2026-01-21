@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once __DIR__ . "/../../connect.php";
 
@@ -6,9 +9,17 @@ if ($_SESSION['role'] !== 'store_owner') {
     die("ไม่มีสิทธิ์");
 }
 
-$id = $_GET['id'] ?? '';
+$id = $_GET['id'] ?? ''; // ← จุดสำคัญ
 
-$stmt = $conn->prepare("SELECT username FROM users WHERE id=? AND role='staff'");
+if ($id == '') {
+    die("ข้อมูลไม่ถูกต้อง");
+}
+
+$stmt = $conn->prepare(
+    "SELECT id_ser, username 
+     FROM users 
+     WHERE id_ser = ? AND role = 'staff'"
+);
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -20,12 +31,18 @@ if ($result->num_rows == 0) {
 $staff = $result->fetch_assoc();
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <title>แก้ไขพนักงาน</title>
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body class="bg-light">
@@ -34,7 +51,8 @@ $staff = $result->fetch_assoc();
 <h4> <i class="bi bi-pencil-square me-2"></i>แก้ไขพนักงาน</h4>
 
 <form method="post" action="add_stff/update_staff.php">
-    <input type="hidden" name="id" value="<?= $id ?>">
+    <input type="hidden" name="id_ser" value="<?= $staff['id_ser'] ?>">
+
 
     <div class="mb-3">
         <label>Username</label>

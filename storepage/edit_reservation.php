@@ -5,21 +5,26 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . "/../config/db.php";
 
-$id = $_GET['id'];
+$id = $_GET['id'] ?? 0;
 
 $sql = "
 SELECT r.*, t.table_number
 FROM reservations r
-JOIN tables t ON r.table_id = t.id
-WHERE r.id = ?
+JOIN tables t ON r.table_id = t.id_show
+WHERE r.id_booking = ?
 ";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $data = $stmt->get_result()->fetch_assoc();
 
+if (!$data) {
+    die("ไม่พบข้อมูลการจอง");
+}
+
 $tables = $conn->query("SELECT * FROM tables");
 ?>
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -38,15 +43,16 @@ $tables = $conn->query("SELECT * FROM tables");
 
 
 <form method="post" action="update_reservation.php" class="card p-3 shadow-sm">
-<input type="hidden" name="id" value="<?= $data['id']; ?>">
+
+<input type="hidden" name="id_booking" value="<?= $data['id_booking']; ?>">
 
 <label>ชื่อลูกค้า</label>
 <input type="text" name="customer_name" class="form-control mb-2"
-       value="<?= $data['customer_name']; ?>" required>
+       value="<?= htmlspecialchars($data['customer_name']); ?>" required>
 
 <label>เบอร์โทร</label>
 <input type="text" name="phone" class="form-control mb-2"
-       value="<?= $data['phone']; ?>" required>
+       value="<?= htmlspecialchars($data['phone']); ?>" required>
 
 <label>วันที่</label>
 <input type="date" name="reservation_date" class="form-control mb-2"
@@ -54,13 +60,13 @@ $tables = $conn->query("SELECT * FROM tables");
 
 <label>เวลา</label>
 <input type="time" name="reservation_time" class="form-control mb-2"
-       value="<?= $data['reservation_time']; ?>" required>
+       value="<?= substr($data['reservation_time'],0,5); ?>" required>
 
 <label>โต๊ะ</label>
 <select name="table_id" class="form-select mb-3">
 <?php while($t = $tables->fetch_assoc()): ?>
-<option value="<?= $t['id']; ?>"
-<?= $t['id']==$data['table_id']?'selected':''; ?>>
+<option value="<?= $t['id_show']; ?>"
+<?= $t['id_show'] == $data['table_id'] ? 'selected' : ''; ?>>
 โต๊ะ <?= $t['table_number']; ?> (<?= $t['seat']; ?> ที่นั่ง)
 </option>
 <?php endwhile; ?>
@@ -72,6 +78,7 @@ $tables = $conn->query("SELECT * FROM tables");
 </div>
 
 </form>
+
 
 </div>
 </body>

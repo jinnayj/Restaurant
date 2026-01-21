@@ -9,7 +9,7 @@ if ($id > 0) {
         UPDATE reservations
         SET status = 'completed',
             completed_at = NOW()
-        WHERE id = ?
+        WHERE id_booking = ?
     ";
 
     $stmt = $conn->prepare($sql);
@@ -17,5 +17,5 @@ if ($id > 0) {
     $stmt->execute();
 }
 
-header("Location:store.php?link=list");
+header("Location: store.php?link=list");
 exit;
