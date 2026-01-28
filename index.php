@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" href="style.css">
     <div class="login-card">
         <h2 class="title">Moonlight</h2>
         <p class="subtitle">เลือกบทบาทของคุณ</p>
@@ -25,8 +25,24 @@
         <a href="login/login.php" class="btn btn-owner">
             เข้าสู่ระบบในฐานะเจ้าของร้าน
         </a>
+
+        <a href="login/login_ct.php" class="btn btn-danger">
+    เข้าสู่ระบบในฐานะลูกค้า
+</a>
+
+
     </div>
 </div>
+
+<style>
+.btn-danger {
+     background: #ff5550 !important;
+}
+.btn-danger:hover {
+    background: #c40404 !important;
+
+}
+</style>
 
 </body>
 </html>

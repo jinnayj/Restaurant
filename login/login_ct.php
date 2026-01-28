@@ -23,7 +23,7 @@
             <div class="text-center mb-4">
                 <img src="../img/logo .png" alt="logo" class="login-logo mb-3">
                 <h4 class="fw-bold text-orange mb-1">
-                    ระบบจัดการจองโต๊ะร้านอาหาร
+                   จองคิวโต๊ะร้านอาหาร Moonlight
                 </h4>
                 <p class="text-muted ">
                     กรุณาเข้าสู่ระบบ
@@ -31,42 +31,46 @@
             </div>
 
             <!-- Login Form -->
-            <form action="login_db.php" method="post">
+            <form action="auth_login.php" method="post">
 
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">Username</label>
-                    <input type="text" name="username"
-                           class="form-control form-control-lg"
-                           placeholder="กรอกชื่อผู้ใช้" required>
-                </div>
+    <div class="mb-4">
+        <label class="form-label fw-semibold  ">Gmail</label>
+        <input type="email" name="email"
+               class="form-control form-control-lg"
+               placeholder="กรอกอีเมล"
+               required>
+    </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Password</label>
-                    <input type="password" name="password"
-                           class="form-control form-control-lg"
-                           placeholder="กรอกรหัสผ่าน" required>
-                </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Password</label>
+        <input type="password" name="password"
+               class="form-control form-control-lg"
+               placeholder="กรอกรหัสผ่าน"
+               required>
+    </div>
 
-                <div class="d-grid mt-3">
-                    <button type="submit" class="btn btn-orange btn-lg fw-bold">
-                        เข้าสู่ระบบ
-                    </button>
-                </div>
+    <div class="d-grid mt-3">
+        <button type="submit" class="btn btn-orange btn-lg fw-bold">
+            เข้าสู่ระบบ
+        </button>
+    </div>
+
+</form>
+
 <div class="text-center mt-3">
+<a href="register.php">สมัครสมาชิก</a>
+</div>
+        </div>
+        <div class="text-center mt-3">
                 <a href="../index.php" class="text-decoration-none">
                     ← กลับไปหน้าเข้าสู่ระบบ
                 </a>
-</div>
-            </form>
-
-        </div>
+                </div>
     </div>
-
-</div>
-</div>
+    </div>
 <style >
 .bg-gradient-custom {
-    background: 135deg, #fff3e6;
+    background: 135deg, #ffffff;
 }
 
 .login-card {

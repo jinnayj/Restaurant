@@ -89,10 +89,7 @@ if ($_SESSION['role'] != 'store_owner') {
 <?php $link = $_GET['link'] ?? 'homes'; ?>
 
 <div class="menu-bar ps-5">
-    <a href="store.php?link=homes"
-       class="<?= $link == 'homes' ? 'active' : '' ?>">
-        หน้าหลัก
-    </a>
+    
 
     <a href="store.php?link=table"
        class="<?= $link == 'table' ? 'active' : '' ?>">

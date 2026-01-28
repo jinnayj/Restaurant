@@ -1,137 +1,113 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__."/../config/db.php";
 
-require_once __DIR__ . "/../config/db.php";
-
-/* รับวันที่จากฟอร์ม */
-$selected_date = $_GET['date'] ?? date('Y-m-d');
-
-/* ดึงรายการจองที่ยังยืนยัน */
-$sql = "
+$stmt = $conn->query("
 SELECT 
-    r.id_booking,
-    r.customer_name,
-    r.phone,
-    r.reservation_time,
-    r.status,
+    r.*,
     t.table_number,
     t.seat
 FROM reservations r
 JOIN tables t ON r.table_id = t.id_show
-WHERE r.reservation_date = ?
-AND r.status = 'confirmed'
-ORDER BY r.reservation_time ASC
-";
-
-
-
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $selected_date);
-$stmt->execute();
-$result = $stmt->get_result();
+ORDER BY r.reservation_date DESC, r.id_booking DESC
+");
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>รายการจอง</title>
+<title>จัดการการจอง</title>
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="../img/logo .png .png">
+<style>
+.badge-orange{
+    background:linear-gradient(135deg,#ff9800,#ffb74d);
+    color:#fff;
+    font-weight:600;
+    border-radius:8px;
+    padding:4px 10px;
+}
+</style>
 </head>
 
 <body class="bg-light">
 <div class="container my-4">
 
-<h4 class="mb-3 text-dark">
-<i class="bi bi-calendar2-check-fill me-2 "></i></i></i>รายการจองวันที่ <?= date('d/m/Y', strtotime($selected_date)); ?>
-</h4>
+<h4 class="mb-4">📋 รายการจองทั้งหมด (เจ้าของร้าน)</h4>
 
-<form method="get" class="row g-2 mb-3">
-    <input type="hidden" name="link" value="list">
-
-    <div class="col-md-4">
-        <input type="date"
-               name="date"
-               value="<?= $selected_date; ?>"
-               class="form-control">
-    </div>
-
-    <div class="col-md-2">
-        <button class="btn btn-warning w-100">
-            ดูรายการ
-        </button>
-    </div>
-</form>
-
-
-<div class="card shadow-sm">
-<div class="card-body">
-
-<?php if ($result->num_rows == 0): ?>
-    <div class="alert alert-info text-center">
-        ไม่มีรายการจองในวันที่เลือก
-    </div>
-<?php else: ?>
-
-<table class="table table-bordered table-hover align-middle">
-<thead class="table-warning text-center">
+<table class="table table-bordered bg-white">
+<thead class="table-dark">
 <tr>
-    <th>ชื่อลูกค้า</th>
-    <th>เบอร์โทร</th>
-    <th>เวลา</th>
-    <th>โต๊ะ</th>
-    <th>ที่นั่ง</th>
-    <th>จัดการ</th>
+  <th>ลูกค้า</th>
+  <th>โต๊ะ</th>
+  <th>วันที่</th>
+  <th>เวลา</th>
+  <th>ที่นั่ง</th>
+  <th>สถานะ</th>
+  <th>สลิป</th>
+  <th>จัดการ</th>
 </tr>
-
 </thead>
-
 <tbody>
-<?php while($row = $result->fetch_assoc()): ?>
-<tr class="text-center">
-    <td><?= htmlspecialchars($row['customer_name']); ?></td>
-    <td><?= htmlspecialchars($row['phone']); ?></td>
-    <td><?= substr($row['reservation_time'], 0, 5); ?></td>
-    <td>โต๊ะ <?= $row['table_number']; ?></td>
-    <td><?= $row['seat']; ?> ที่นั่ง</td>
-    <td>
 
-    <td class="text-center">
-<a href="store.php?link=edit_lists&id=<?= $row['id_booking']; ?>"
-   class="btn btn-sm btn-warning"><i class="bi bi-pencil-square me-2"></i>แก้ไข</a>
+<?php while($r = $stmt->fetch_assoc()): ?>
+<tr>
+<td><?= htmlspecialchars($r['customer_name']) ?></td>
+<td>โต๊ะ <?= $r['table_number'] ?></td>
+<td><?= $r['reservation_date'] ?></td>
+<td><?= substr($r['reservation_time'],0,5) ?></td>
+<td><?= $r['seat'] ?> คน</td>
 
-<a href="cancel_reservation.php?id=<?= $row['id_booking']; ?>"
-   class="btn btn-sm btn-danger"
-   onclick="return confirm('ยืนยันยกเลิกการจองนี้?');">
-   <i class="bi bi-trash3 me-2"></i> ยกเลิก
+<td>
+<?php
+if ($r['status'] === 'pending_payment') {
+    echo '<span class="badge badge-orange">รอชำระเงิน</span>';
+} elseif ($r['status'] === 'waiting_confirm') {
+    echo '<span class="badge badge-orange">รอยืนยัน</span>';
+} elseif ($r['status'] === 'confirmed') {
+    echo '<span class="badge bg-warning text-dark">จองแล้ว</span>';
+} elseif ($r['status'] === 'using') {
+    echo '<span class="badge bg-danger">กำลังใช้</span>';
+}
+?>
+</td>
+
+<td class="text-center">
+<?php if(!empty($r['slip_image'])): ?>
+<a href="../uploads/slips/<?= $r['slip_image'] ?>" target="_blank"
+   class="btn btn-sm btn-outline-secondary">
+ดูสลิป
 </a>
-<?php if ($row['status'] == 'confirmed'): ?>
-    <a href="complete_reservation.php?id=<?= $row['id_booking']; ?>"
-       class="btn btn-sm btn-success"
-       onclick="return confirm('ยืนยันว่าใช้งานเสร็จแล้ว?');">
-       <i class="bi bi-check2-circle me-2"></i>เสร็จสิ้น
-    </a>
+<?php else: ?>
+-
 <?php endif; ?>
 </td>
-       
-    </td>
-</tr>
-<?php endwhile; ?>
-</tbody>
-</table>
 
+<td>
+<?php if($r['status'] === 'waiting_confirm'): ?>
+<a href="confirm_payment.php?id=<?= $r['id_booking'] ?>"
+   class="btn btn-sm btn-success">
+ยืนยันสลิป
+</a>
 <?php endif; ?>
 
-</div>
-</div>
+<?php if($r['status'] === 'confirmed'): ?>
+<a href="update_status.php?id=<?= $r['id_booking'] ?>&status=using"
+   class="btn btn-sm btn-danger">
+เริ่มใช้งาน
+</a>
+<?php endif; ?>
+
+<?php if($r['status'] === 'using'): ?>
+<a href="update_status.php?id=<?= $r['id_booking'] ?>&status=finished"
+   class="btn btn-sm btn-secondary">
+เสร็จสิ้น
+</a>
+<?php endif; ?>
+</td>
+</tr>
+<?php endwhile; ?>
+
+</tbody>
+</table>
 
 </div>
 </body>
