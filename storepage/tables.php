@@ -51,6 +51,17 @@ LEFT JOIN reservations r
 ORDER BY t.id_show ASC
 ";
 
+$pending = $conn->query("
+SELECT COUNT(DISTINCT table_id) c FROM reservations
+WHERE reservation_date='$selected_date'
+AND status IN('pending_payment','waiting_confirm')
+")->fetch_assoc()['c'];
+
+$confirmed = $conn->query("
+SELECT COUNT(DISTINCT table_id) c FROM reservations
+WHERE reservation_date='$selected_date' AND status='confirmed'
+")->fetch_assoc()['c'];
+
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $selected_date);
@@ -84,6 +95,33 @@ $tables = $stmt->get_result();
 .btn-orange-gradient{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;border:none;font-weight:600;border-radius:10px}
 .btn-orange-gradient:hover{background:linear-gradient(135deg,#ff5722,#e65100)}
 .border-orange-right{border-right:4px solid #ff9800;color:#e65100}
+/* รอการยืนยัน (ส้ม) */
+.border-right{
+    border-right:4px solid #ff9800 !important;
+}
+.text-orange{
+    color:#ff9800;
+}
+
+.pending{
+    background:linear-gradient(135deg,#ff9800,#ffcc80);
+    color:#fff;
+}
+
+/* จองแล้ว (เหลือง) */
+.confirmed{
+    background:linear-gradient(135deg,#ffc107,#ffe082);
+    color:#000;
+}
+
+/* กำลังใช้งาน (แดง) */
+.using{
+    background:linear-gradient(135deg,#dc3545,#ff6f61);
+    color:#fff;
+}
+.border-5{
+    border-right:8px solid !important;
+}
 </style>
 </head>
 <body>
@@ -105,11 +143,40 @@ $tables = $stmt->get_result();
 </div>
 </div>
 
+
 <!-- ===== Summary ===== -->
 <div class="row g-3 mb-4">
-<div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm border-orange-right">โต๊ะทั้งหมด<br><b><?= $total ?></b></div></div>
-<div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-success border-end border-4 border-success">ว่าง<br><b><?= $available ?></b></div></div>
-<div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-danger border-end border-4 border-danger">กำลังใช้<br><b><?= $using ?></b></div></div>
+  <!-- ว่าง -->
+  <div class="col-md-3">
+    <div class="p-3 bg-white rounded shadow-sm text-success border-end border-4 border-success border-5">
+      ว่าง<br>
+      <b><?= $available ?></b>
+    </div>
+  </div>
+
+  <!-- รอการยืนยัน (ส้ม) -->
+  <div class="col-md-3">
+   <div class="p-3 bg-white rounded shadow-sm text-orange border-right border-4 border-5 ">
+      รอการยืนยัน<br>
+      <b><?= $pending ?></b>
+    </div>
+  </div>
+
+  <!-- จองแล้ว (เหลือง) -->
+  <div class="col-md-3">
+    <div class="p-3 bg-white rounded shadow-sm text-warning border-end border-4 border-warning border-5">
+      จองแล้ว<br>
+      <b><?= $confirmed ?></b>
+    </div>
+  </div>
+
+  <!-- กำลังใช้ -->
+  <div class="col-md-3">
+    <div class="p-3 bg-white rounded shadow-sm text-danger border-end border-4 border-danger border-5">
+      กำลังใช้<br>
+      <b><?= $using ?></b>
+    </div>
+  </div>
 </div>
 
 <!-- ===== แผนผังโต๊ะ ===== -->
@@ -117,9 +184,23 @@ $tables = $stmt->get_result();
 <div class="card-body">
 
 <div class="mb-3">
-<span class="badge bg-success">ว่าง</span>
-<span class="badge bg-danger ms-2">กำลังใช้</span>
+  <span class="badge bg-success">ว่าง</span>
+
+  <span class="badge ms-2"
+        style="background:#ff9800;color:#fff;">
+    รอการยืนยัน
+  </span>
+
+  <span class="badge ms-2"
+        style="background:#ffc107;color:#000;">
+    จองแล้ว
+  </span>
+
+  <span class="badge bg-danger ms-2">
+    กำลังใช้
+  </span>
 </div>
+
 
 <div class="table-area">
 <?php while($t = $tables->fetch_assoc()): ?>
@@ -147,24 +228,39 @@ $tables = $stmt->get_result();
 </div>
 
 <!-- ===== Modal เปลี่ยนสถานะ ===== -->
-<div class="modal fade" id="statusModal">
-<div class="modal-dialog">
-<form class="modal-content" method="post" action="change_table_status.php">
-<input type="hidden" name="reservation_date" value="<?= $selected_date ?>">
-<input type="hidden" name="table_id" id="modal_table_id">
+<div class="modal fade" id="statusModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="change_table_status.php">
 
-<div class="modal-header"><h5 class="modal-title">เปลี่ยนสถานะโต๊ะ</h5></div>
-<div class="modal-body">
-<select name="status" class="form-select" required>
-    <option value="available">ว่าง</option>
-    <option value="using">กำลังใช้</option>
-</select>
+      <input type="hidden" name="reservation_date" value="<?= $selected_date ?>">
+      <input type="hidden" name="table_id" id="modal_table_id">
+      <input type="hidden" name="status" value="using">
 
+      <div class="modal-header">
+        <h5 class="modal-title">เปลี่ยนสถานะโต๊ะ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p class="mb-3">ยืนยันเปลี่ยนสถานะโต๊ะเป็น</p>
+
+        <span class="badge bg-danger fs-5 px-4 py-2">
+          กำลังใช้งาน
+        </span>
+      </div>
+
+      <div class="modal-footer d-flex justify-content-center">
+  <button type="submit" class="badge bg-danger fs-5 px-4 py-2">
+    เริ่มใช้งานโต๊ะ
+  </button>
 </div>
-<div class="modal-footer"><button class="btn btn-success">บันทึก</button></div>
-</form>
+
+
+    </form>
+  </div>
 </div>
-</div>
+
+
 
 <!-- ===== Modal รายละเอียด ===== -->
 <div class="modal fade" id="detailModal">

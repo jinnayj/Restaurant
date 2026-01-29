@@ -1,11 +1,7 @@
 <?php
-$link = $_GET['link'] ?? 'homes';
+$link = $_GET['link'] ?? 'table';
 
 switch ($link) {
-
-    case 'homes':
-        include_once 'homes.php';
-        break;
 
     case 'table':
         include_once 'tables.php';
@@ -15,14 +11,13 @@ switch ($link) {
         include_once 'lists.php';
         break;
 
-        case 'edit_lists':
+    case 'edit_lists':
         include_once 'edit_reservation.php';
         break;
-        
+
     case 'reports':
         include_once 'reports.php';
         break;
-
 
     case 'add':
         include_once 'add_stff/addstffs.php';
@@ -33,5 +28,7 @@ switch ($link) {
         break;
 
     default:
-        include_once 'homes.php';
+        include_once 'tables.php';
+        break;
+   
 }
